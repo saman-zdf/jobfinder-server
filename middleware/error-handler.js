@@ -1,6 +1,5 @@
 import { StatusCodes } from 'http-status-codes';
 const errorHandlerMiddleware = (err, req, res, next) => {
-  console.log(err.message);
   // creating a default error object
   const defaultError = {
     // adding statusCode property and assign it to the status codes package
