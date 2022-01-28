@@ -1,10 +1,11 @@
 import { StatusCodes } from 'http-status-codes';
 const errorHandlerMiddleware = (err, req, res, next) => {
+  console.log(err.message);
   // creating a default error object
   const defaultError = {
     // adding statusCode property and assign it to the status codes package
-    statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-    msg: 'Something went wrong, try again later!',
+    statusCode: err.statusCode || StatusCodes.INTERNAL_SERVER_ERROR,
+    msg: err.message || 'Something went wrong, try again later!',
   };
   // check if the error name is equal to ValidationError
   if (err.name === 'ValidationError') {
