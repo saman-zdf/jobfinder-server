@@ -14,8 +14,11 @@
   "dependencies": {
     "dotenv": "^14.3.2",
     "express": "^4.17.2",
+    "express-async-errors": "^3.1.1",
+    "http-status-codes": "^2.2.0",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^6.1.8"
+    "mongoose": "^6.1.8",
+    "validator": "^13.7.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.15"
