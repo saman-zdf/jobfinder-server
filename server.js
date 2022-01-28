@@ -23,6 +23,7 @@ app.use('/auth', authRoutes);
 import jobRoutes from './routes/jobRoutes.js';
 app.use('/job', jobRoutes);
 
+// it does not need to be invoked, it just need to be used as a middleware
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
 
