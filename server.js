@@ -14,9 +14,13 @@ app.use(express.json());
 app.get('/', (req, res) => {
   res.status(200).send('hello world');
 });
-// auth router
+// auth routes
 import authRoutes from './routes/authRoutes.js';
-app.use('/user', authRoutes);
+app.use('/auth', authRoutes);
+
+// job routes
+import jobRoutes from './routes/jobRoutes.js';
+app.use('/job', jobRoutes);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
