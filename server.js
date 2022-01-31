@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import 'express-async-errors';
+import morgan from 'morgan';
 dotenv.config();
 const app = express();
 
@@ -10,6 +11,9 @@ import connectDB from './DB/connectDB.js';
 // Middleware
 import notFoundMiddleware from './middleware/not-found.js';
 import errorHandlerMiddleware from './middleware/error-handler.js';
+if (process.env.NODE_ENV !== 'production') {
+  app.use(morgan('dev'));
+}
 app.use(express.json());
 
 app.get('/', (req, res) => {
@@ -20,11 +24,11 @@ app.get('/api/v1', (req, res) => {
 });
 // auth routes
 import authRoutes from './routes/authRoutes.js';
-app.use('/auth', authRoutes);
+app.use('/api/v1/auth', authRoutes);
 
 // job routes
 import jobRoutes from './routes/jobRoutes.js';
-app.use('/job', jobRoutes);
+app.use('/api/v1/job', jobRoutes);
 
 // it does not need to be invoked, it just need to be used as a middleware
 app.use(notFoundMiddleware);
