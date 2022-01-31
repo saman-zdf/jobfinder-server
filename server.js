@@ -13,7 +13,10 @@ import errorHandlerMiddleware from './middleware/error-handler.js';
 app.use(express.json());
 
 app.get('/', (req, res) => {
-  res.status(200).send('hello world');
+  res.status(200).json({ msg: 'Welcome to dashboard page' });
+});
+app.get('/api/v1', (req, res) => {
+  res.status(200).json({ msg: 'API' });
 });
 // auth routes
 import authRoutes from './routes/authRoutes.js';
