@@ -10,6 +10,7 @@ import connectDB from './DB/connectDB.js';
 // /in ES6 module you need to add .js extension for importing
 // Middleware
 import notFoundMiddleware from './middleware/not-found.js';
+import authenticateUser from './middleware/auth.js';
 import errorHandlerMiddleware from './middleware/error-handler.js';
 if (process.env.NODE_ENV !== 'production') {
   app.use(morgan('dev'));
@@ -28,7 +29,7 @@ app.use('/api/v1/auth', authRoutes);
 
 // job routes
 import jobRoutes from './routes/jobRoutes.js';
-app.use('/api/v1/job', jobRoutes);
+app.use('/api/v1/job', authenticateUser, jobRoutes);
 
 // it does not need to be invoked, it just need to be used as a middleware
 app.use(notFoundMiddleware);
