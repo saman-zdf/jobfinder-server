@@ -1,16 +1,33 @@
-const getAllJobs = (req, res) => {
-  res.send('Get All Jobs');
+import Job from '../model/Job.js';
+import { StatusCodes } from 'http-status-codes';
+import {
+  BadRequestError,
+  NotFoundError,
+  UnauthenticatedError,
+} from '../errors/index.js';
+
+const getAllJobs = async (req, res) => {
+  res.send('get all jobs');
 };
-const createJob = (req, res) => {
-  res.send('create job');
+
+const createJob = async (req, res) => {
+  const { company, position } = req.body;
+
+  if (!company && !position) {
+    throw new BadRequestError('Please provide all values');
+  }
+  req.body.createdBy = req.user.userId;
+  const job = await Job.create(req.body);
+
+  res.status(StatusCodes.CREATED).json({ job });
 };
-const showStats = (req, res) => {
+const showStats = async (req, res) => {
   res.send('show stats');
 };
-const deleteJob = (req, res) => {
+const deleteJob = async (req, res) => {
   res.send('delete job');
 };
-const updateJob = (req, res) => {
+const updateJob = async (req, res) => {
   res.send('update job');
 };
 
