@@ -5,6 +5,7 @@ import {
   NotFoundError,
   UnauthenticatedError,
 } from '../errors/index.js';
+import checkPermission from '../utils/checkPermission.js';
 
 const getAllJobs = async (req, res) => {
   const jobs = await Job.find({ createdBy: req.user.userId });
@@ -25,14 +26,45 @@ const createJob = async (req, res) => {
 
   res.status(StatusCodes.CREATED).json({ job });
 };
+
+// Update job
+const updateJob = async (req, res) => {
+  const { id: jobId } = req.params;
+  const { company, position, jobLocation, jobType, status } = req.body;
+  if (!company && !position) {
+    throw new BadRequestError('Please provide all values');
+  }
+  const job = await Job.findOne({ _id: jobId });
+  if (!job) {
+    throw new NotFoundError(`No job with id ${jobId}`);
+  }
+
+  // check permission
+  console.log(req.user.userId);
+  console.log(job.createdBy);
+
+  checkPermission(req.user, job.createdBy);
+
+  // findOneAndUpdate does not trigger the hooks in the model if there is any, in this case job does not have any
+  const updatedJob = await Job.findOneAndUpdate({ _id: jobId }, req.body, {
+    new: true,
+    runValidators: true,
+  });
+  // if there are any hooks in your model lie user model you need to use findOne for update and attach all the data from req.body to the item you found in this case job, but if there is no hook in your model you can use findOneAndUpdate.
+  // job.position = position;
+  // job.company = company;
+  // job.jobLocation = jobLocation;
+  // job.status = status;
+  // job.jobType = jobType;
+  // await job.save();
+  res.status(StatusCodes.OK).json({ updatedJob });
+};
+
 const showStats = async (req, res) => {
   res.send('show stats');
 };
 const deleteJob = async (req, res) => {
   res.send('delete job');
-};
-const updateJob = async (req, res) => {
-  res.send('update job');
 };
 
 export { getAllJobs, createJob, showStats, deleteJob, updateJob };
