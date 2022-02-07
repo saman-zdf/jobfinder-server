@@ -39,10 +39,10 @@ const updateJob = async (req, res) => {
     throw new NotFoundError(`No job with id ${jobId}`);
   }
 
-  // check permission
-  console.log(req.user.userId);
-  console.log(job.createdBy);
+  // console.log(typeof req.user.userId);
+  // console.log(typeof job.createdBy);
 
+  // check permission
   checkPermission(req.user, job.createdBy);
 
   // findOneAndUpdate does not trigger the hooks in the model if there is any, in this case job does not have any
@@ -63,8 +63,20 @@ const updateJob = async (req, res) => {
 const showStats = async (req, res) => {
   res.send('show stats');
 };
+
+// delete job
 const deleteJob = async (req, res) => {
-  res.send('delete job');
+  const { id: jobId } = req.params;
+  const job = await Job.findOne({ _id: jobId });
+  if (!job) {
+    throw new NotFoundError(`No job with id ${jobId}`);
+  }
+  // this is a alternative for deleting
+  // const deletedJob = await Job.findOneAndRemove({_id: jobId})
+  checkPermission(req.user, job.createdBy);
+
+  await job.remove();
+  res.status(StatusCodes.OK).json({ msg: 'Success! Job removed!' });
 };
 
 export { getAllJobs, createJob, showStats, deleteJob, updateJob };
