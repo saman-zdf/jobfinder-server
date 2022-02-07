@@ -6,6 +6,7 @@ import {
   UnauthenticatedError,
 } from '../errors/index.js';
 import checkPermission from '../utils/checkPermission.js';
+import mongoose from 'mongoose';
 
 const getAllJobs = async (req, res) => {
   const jobs = await Job.find({ createdBy: req.user.userId });
@@ -60,10 +61,6 @@ const updateJob = async (req, res) => {
   res.status(StatusCodes.OK).json({ updatedJob });
 };
 
-const showStats = async (req, res) => {
-  res.send('show stats');
-};
-
 // delete job
 const deleteJob = async (req, res) => {
   const { id: jobId } = req.params;
@@ -77,6 +74,27 @@ const deleteJob = async (req, res) => {
 
   await job.remove();
   res.status(StatusCodes.OK).json({ msg: 'Success! Job removed!' });
+};
+
+// get job by stats
+const showStats = async (req, res) => {
+  let stats = await Job.aggregate([
+    { $match: { createdBy: mongoose.Types.ObjectId(req.user.userId) } },
+    { $group: { _id: '$status', count: { $sum: 1 } } },
+  ]);
+
+  stats = stats.reduce((acc, cur) => {
+    const { _id: title, count } = cur;
+    acc[title] = count;
+    return acc;
+  }, {});
+  const defaultStats = {
+    pending: stats.pending || 0,
+    interview: stats.interview || 0,
+    declined: stats.declined || 0,
+  };
+  let monthlyApplication = [];
+  res.status(StatusCodes.OK).json({ defaultStats, monthlyApplication });
 };
 
 export { getAllJobs, createJob, showStats, deleteJob, updateJob };
