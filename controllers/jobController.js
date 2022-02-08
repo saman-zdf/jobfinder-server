@@ -7,6 +7,7 @@ import {
 } from '../errors/index.js';
 import checkPermission from '../utils/checkPermission.js';
 import mongoose from 'mongoose';
+import moment from 'moment';
 
 const getAllJobs = async (req, res) => {
   const jobs = await Job.find({ createdBy: req.user.userId });
@@ -118,6 +119,19 @@ const showStats = async (req, res) => {
     // $limit will make a limitation for months
     { $limit: 6 },
   ]);
+  monthlyApplication = monthlyApplication
+    .map((item) => {
+      const {
+        _id: { year, month },
+        count,
+      } = item;
+      const date = moment()
+        .month(month - 1)
+        .year(year)
+        .format('MMM Y');
+      return { date, count };
+    })
+    .reverse();
   res.status(StatusCodes.OK).json({ defaultStats, monthlyApplication });
 };
 
