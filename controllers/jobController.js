@@ -1,22 +1,39 @@
 import Job from '../model/Job.js';
 import { StatusCodes } from 'http-status-codes';
-import {
-  BadRequestError,
-  NotFoundError,
-  UnauthenticatedError,
-} from '../errors/index.js';
+import { BadRequestError, NotFoundError } from '../errors/index.js';
 import checkPermission from '../utils/checkPermission.js';
 import mongoose from 'mongoose';
 import moment from 'moment';
 
+// get all jobs
 const getAllJobs = async (req, res) => {
-  const jobs = await Job.find({ createdBy: req.user.userId });
+  const { status, search, jobType, sort } = req.query;
+
+  const queryObject = {
+    createdBy: req.user.userId,
+  };
+  // add stuff based on condition.
+
+  if (status !== 'all') {
+    queryObject.status = status;
+  }
+
+  if (jobType !== 'all') {
+    queryObject.jobType = jobType;
+  }
+
+  // no await
+  let result = Job.find(queryObject);
+
+  // chain sort condition
+  const jobs = await result;
 
   res
     .status(StatusCodes.OK)
     .json({ jobs, totalJobs: jobs.length, numOfPage: 1 });
 };
 
+// created job
 const createJob = async (req, res) => {
   const { company, position } = req.body;
 
