@@ -79,7 +79,9 @@ const deleteJob = async (req, res) => {
 // get job by stats
 const showStats = async (req, res) => {
   let stats = await Job.aggregate([
+    // first we find jobs where they match with current user
     { $match: { createdBy: mongoose.Types.ObjectId(req.user.userId) } },
+    // then we group them with any property we have in our collection, in this case with status
     { $group: { _id: '$status', count: { $sum: 1 } } },
   ]);
 
@@ -93,7 +95,29 @@ const showStats = async (req, res) => {
     interview: stats.interview || 0,
     declined: stats.declined || 0,
   };
-  let monthlyApplication = [];
+  let monthlyApplication = await Job.aggregate([
+    // first we find jobs where they match with current user
+    { $match: { createdBy: mongoose.Types.ObjectId(req.user.userId) } },
+    // then we group them with year and month for our chart, _id will be the object which hold data of year and month, $year: '$createdAt' will give us the year, $month: '$createdAt' will give us the month
+    {
+      $group: {
+        _id: {
+          year: {
+            $year: '$createdAt',
+          },
+          month: {
+            $month: '$createdAt',
+          },
+        },
+        // count will calculate the sum of jobs with $sum to give us how many job were created at that specific month
+        count: { $sum: 1 },
+      },
+    },
+    // with $sort we can sort the data to get the latest jobs
+    { $sort: { '_id.year': -1, '_id.month': -1 } },
+    // $limit will make a limitation for months
+    { $limit: 6 },
+  ]);
   res.status(StatusCodes.OK).json({ defaultStats, monthlyApplication });
 };
 
