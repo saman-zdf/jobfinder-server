@@ -3,6 +3,9 @@ import dotenv from 'dotenv';
 import 'express-async-errors';
 import morgan from 'morgan';
 dotenv.config();
+import helmet from 'helmet';
+import xss from 'xss-clean';
+import mongoSanitize from 'express-mongo-sanitize';
 const app = express();
 
 import connectDB from './DB/connectDB.js';
@@ -16,6 +19,9 @@ if (process.env.NODE_ENV !== 'production') {
   app.use(morgan('dev'));
 }
 app.use(express.json());
+app.use(helmet());
+app.use(xss());
+app.use(mongoSanitize());
 
 app.get('/', (req, res) => {
   res.status(200).json({ msg: 'Welcome to dashboard page' });

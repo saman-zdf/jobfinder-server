@@ -40,7 +40,6 @@ const login = async (req, res) => {
     throw new BadRequestError('Please provide all values');
   }
   const user = await User.findOne({ email }).select('+password');
-  console.log(user);
   if (!user) {
     throw new UnauthenticatedError('Invalid Credentials!');
   }
